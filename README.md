@@ -65,6 +65,10 @@ Optional extras (Docling, Crawl4AI, RAGAS, DeepEval): `bun run setup:extras`.
 
 ## Deploy
 
+Two separate deployments: **website on Vercel**, **Python API on a host with ≥1.5 GB RAM** (Railway, Render, or a Hugging Face Space). Do **not** use Vercel's "multi-service" option: PyTorch and the models are far too big for Vercel Python functions. The root `vercel.json` makes Vercel treat the repo as a plain Next.js project.
+
+Order: deploy the backend first → copy its URL → deploy the frontend with that URL.
+
 **Backend → Railway (or Render)**
 - Root directory: `backend`. Install: `pip install -r requirements-deploy.txt` (CPU-only PyTorch). Start: the `Procfile` (`uvicorn main:app --host 0.0.0.0 --port $PORT`).
 - Env vars: `GROQ_API_KEY`, `API_SHARED_SECRET` (any long random string), optional `GROQ_MODEL`, `GROQ_FAST_MODEL`.
