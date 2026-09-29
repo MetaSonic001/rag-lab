@@ -59,7 +59,7 @@ _SECRET = os.getenv("API_SHARED_SECRET", "")
 @app.middleware("http")
 async def require_shared_secret(request, call_next):
     """Optional: when API_SHARED_SECRET is set, only the Next.js proxy (which sends it) may call this API."""
-    if _SECRET and request.method != "OPTIONS" and request.headers.get("x-api-secret") != _SECRET:
+    if _SECRET and request.method != "OPTIONS" and request.url.path != "/health" and request.headers.get("x-api-secret") != _SECRET:
         from fastapi.responses import JSONResponse
         return JSONResponse({"detail": "forbidden"}, status_code=403)
     return await call_next(request)
@@ -73,6 +73,12 @@ for name in LESSONS:
     except Exception as e:  # keep the rest of the lab alive
         LOADED[name] = f"failed: {e}"
         traceback.print_exc()
+
+
+@app.get("/health")
+def health():
+    """Public, secret-free liveness check for the hosting platform (Render / Railway)."""
+    return {"ok": True}
 
 
 # ── status ──────────────────────────────────────────────────────────────
