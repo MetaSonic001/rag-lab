@@ -1,0 +1,72 @@
+"""Break RAG scenarios. Each one is a *real* configuration pair: the frontend runs `broken` and `fixed`
+through the lab engine and shows the measured difference. `facts` are the strings the context MUST contain
+to be able to answer; coverage is measured by substring match (no LLM involved).
+"""
+
+SCENARIOS = [
+    {
+        "id": "bad-chunking", "title": "Bad chunking", "icon": "scissors",
+        "symptom": "The answer is half right. One fact is there, the other is missing.",
+        "question": "What is the condonation fee and which attendance range qualifies?",
+        "facts": ["Rs. 500", "65%"], "corpus": "attendance",
+        "broken": {"chunk_strategy": "fixed", "chunk_size": 200, "chunk_overlap": 0, "contextual": False, "top_k": 1},
+        "fixed": {"chunk_strategy": "heading", "chunk_size": 500, "chunk_overlap": 0, "contextual": True, "top_k": 1},
+        "diagnosis": "Fixed 200-character chunks cut the policy in the middle. The fee and the percentage range ended up in different chunks, and only one was retrieved.",
+        "fix": "Chunk by document structure (one chunk per section) so related facts stay together.",
+        "llm_dependent": False,
+    },
+    {
+        "id": "wrong-retrieval", "title": "Wrong retrieval", "icon": "search-x",
+        "symptom": "The system confidently answers from the wrong section.",
+        "question": "How do I contest an incorrect record?", "facts": ["Attendance Correction Form"], "corpus": "attendance",
+        "broken": {"embedding_model": "hashing", "top_k": 2, "chunk_strategy": "heading", "chunk_size": 500},
+        "fixed": {"embedding_model": "minilm", "top_k": 2, "chunk_strategy": "heading", "chunk_size": 500},
+        "diagnosis": "The 'embedding' only counts words. 'Contest' and 'record' never appear in the appeals section, so it scores zero for the right chunk.",
+        "fix": "Use a real embedding model that maps 'contest an incorrect record' near 'Appeals'.",
+        "llm_dependent": False,
+    },
+    {
+        "id": "low-top-k", "title": "Top-K too low", "icon": "list-minus",
+        "symptom": "Questions with several parts get a partial answer.",
+        "question": "What attendance is required for theory, labs, and students registered with the Accessibility Cell?",
+        "facts": ["75%", "80%", "reduced minimum of 65%"], "corpus": "attendance",
+        "broken": {"top_k": 1, "chunk_strategy": "heading", "chunk_size": 500},
+        "fixed": {"top_k": 5, "chunk_strategy": "heading", "chunk_size": 500},
+        "diagnosis": "The answer lives in three sections. Top-1 can only ever return one of them.",
+        "fix": "Raise Top-K (and rerank, so a bigger K does not add noise).",
+        "llm_dependent": False,
+    },
+    {
+        "id": "semantic-failure", "title": "Semantic similarity failure", "icon": "sigma",
+        "symptom": "Search returns something that sounds related but is not what was asked.",
+        "question": "payment.captured", "facts": ["payment.captured"], "corpus": "ragpay",
+        "broken": {"retriever": "vector", "top_k": 2, "chunk_strategy": "heading", "chunk_size": 600, "chunk_overlap": 0},
+        "fixed": {"retriever": "hybrid", "top_k": 2, "chunk_strategy": "heading", "chunk_size": 600, "chunk_overlap": 0},
+        "diagnosis": "To an embedding model, the webhook event `payment.captured` is 'about capturing payments', so it returns the Capture API. It cannot match an exact identifier.",
+        "fix": "Hybrid search: BM25 matches the exact token, vectors match the meaning, and fusion combines both.",
+        "llm_dependent": False,
+    },
+    {
+        "id": "missing-context", "title": "Missing context", "icon": "file-question",
+        "symptom": "The question is not in the documents at all, yet the system answers.",
+        "question": "What is the hostel curfew time?", "facts": None, "corpus": "attendance",
+        "broken": {"prompt": "naive", "top_k": 3, "min_score": None},
+        "fixed": {"prompt": "strict", "top_k": 3, "min_score": 0.35},
+        "diagnosis": "Top-K always returns K chunks, even when none is relevant. The best score here is low (see the measurement), but nothing checks it.",
+        "fix": "Add a relevance threshold so irrelevant chunks are dropped, and a strict prompt that permits 'I don't know'.",
+        "llm_dependent": True,
+        "simulated_broken": "The hostel curfew is 10:00 PM on weekdays and 11:00 PM on weekends. [1]",
+    },
+    {
+        "id": "hallucination", "title": "Hallucination", "icon": "ghost",
+        "symptom": "The answer contains a detail that appears in no source.",
+        "question": "How many make-up sessions are allowed, and what is the fee for a late make-up session?",
+        "facts": ["2 make-up sessions"], "corpus": "attendance",
+        "broken": {"prompt": "naive", "top_k": 3, "chunk_strategy": "heading", "chunk_size": 500},
+        "fixed": {"prompt": "strict", "top_k": 3, "chunk_strategy": "heading", "chunk_size": 500},
+        "diagnosis": "Half of the question is answerable (2 sessions) and half is not (no fee is documented). A loosely prompted model fills the gap with a plausible number.",
+        "fix": "Instruct the model to answer only from context, cite each claim, and state what is missing.",
+        "llm_dependent": True,
+        "simulated_broken": "Two make-up sessions are allowed per semester, and a late make-up session costs Rs. 200. [1]",
+    },
+]

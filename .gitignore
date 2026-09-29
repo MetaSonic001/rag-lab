@@ -34,3 +34,15 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# allow the env template
+!.env.example
+# python
+__pycache__/
+backend/.venv/
+backend/.install.log
+backend/data/attendance_policy.pdf
+
+backend/.server.*
+backend/.install*.log
+.claude/

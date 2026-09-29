@@ -1,0 +1,192 @@
+[
+ {
+  "q": "Why did I receive less than my expected settlement amount?",
+  "gold": [
+   "settlement-reconciliation.md",
+   "settlement-fees-and-tax.md",
+   "refunds.md"
+  ],
+  "ref": "Net settlement equals gross captured amount minus platform fees, GST on fees, refunds issued in the period and dispute holds."
+ },
+ {
+  "q": "When will my settlement arrive?",
+  "gold": [
+   "settlements.md"
+  ],
+  "ref": "Standard settlement cycle is T+2 working days, skipping weekends and holidays, plus up to 4 hours for bank credit."
+ },
+ {
+  "q": "How do I issue a refund?",
+  "gold": [
+   "refunds.md"
+  ],
+  "ref": "Call POST /v1/payments/{id}/refund with an optional amount and speed; only captured payments can be refunded."
+ },
+ {
+  "q": "What documents are required for merchant verification of a company?",
+  "gold": [
+   "kyc-verification.md"
+  ],
+  "ref": "Company PAN, certificate of incorporation, GST certificate, director PAN and Aadhaar, board resolution and bank proof in company name."
+ },
+ {
+  "q": "Which API should I use for recurring payments?",
+  "gold": [
+   "recurring-payments.md"
+  ],
+  "ref": "Use the Subscriptions API with a plan_id for fixed schedules, or the Mandates API for variable amounts."
+ },
+ {
+  "q": "Customer was debited but my order shows failed",
+  "gold": [
+   "payment-states.md",
+   "webhooks.md",
+   "webhook-troubleshooting.md"
+  ],
+  "ref": "The payment is likely captured but the payment.captured webhook was not processed; fetch the payment to verify."
+ },
+ {
+  "q": "What does PAY_ERR_3DS_FAILED mean?",
+  "gold": [
+   "payment-failure-codes.md"
+  ],
+  "ref": "3-D Secure OTP authentication failed or timed out; the customer must retry and complete the OTP within 5 minutes."
+ },
+ {
+  "q": "I get 401 AUTH_INVALID_KEY",
+  "gold": [
+   "authentication.md"
+  ],
+  "ref": "The key_id does not exist or a test key was used against live data or vice versa."
+ },
+ {
+  "q": "How long do I have to respond to a chargeback?",
+  "gold": [
+   "disputes-chargebacks.md"
+  ],
+  "ref": "7 calendar days to submit evidence; missing the deadline is an automatic loss."
+ },
+ {
+  "q": "Refund has not reached the customer, what should I check?",
+  "gold": [
+   "refund-troubleshooting.md",
+   "refunds.md"
+  ],
+  "ref": "Fetch the refund; if processed share the ARN with the customer; card refunds take 5-7 working days."
+ },
+ {
+  "q": "What is the platform fee and GST?",
+  "gold": [
+   "settlement-fees-and-tax.md"
+  ],
+  "ref": "2% platform fee on cards, UPI and wallets plus 18% GST charged on the fee."
+ },
+ {
+  "q": "My webhook signature does not match",
+  "gold": [
+   "webhooks.md",
+   "webhook-troubleshooting.md"
+  ],
+  "ref": "Verify HMAC-SHA256 on the raw request body with the webhook secret, not a re-serialised body."
+ },
+ {
+  "q": "Payment authorized but not captured after several days",
+  "gold": [
+   "payments-api.md",
+   "payment-states.md"
+  ],
+  "ref": "With manual capture an authorized payment is voided after 5 days unless captured."
+ },
+ {
+  "q": "How does idempotency work on POST requests?",
+  "gold": [
+   "idempotency.md"
+  ],
+  "ref": "Send an Idempotency-Key header; repeats within 24 hours return the original response."
+ },
+ {
+  "q": "How fast are UPI refunds?",
+  "gold": [
+   "refunds.md",
+   "upi-payments.md"
+  ],
+  "ref": "UPI refunds arrive in 1-3 working days."
+ },
+ {
+  "q": "What is the rate limit for the API?",
+  "gold": [
+   "rate-limits-and-errors.md"
+  ],
+  "ref": "Live mode allows 1000 requests per minute; exceeding returns 429 RATE_LIMIT_EXCEEDED."
+ },
+ {
+  "q": "UPI_TIMEOUT",
+  "gold": [
+   "payment-failure-codes.md",
+   "upi-payments.md"
+  ],
+  "ref": "The customer did not approve the UPI collect request within 5 minutes."
+ },
+ {
+  "q": "AUTH_IP_NOT_ALLOWED",
+  "gold": [
+   "authentication.md"
+  ],
+  "ref": "An IP allow-list is configured and the server IP is not on it."
+ },
+ {
+  "q": "409 IDEMPOTENCY_CONFLICT",
+  "gold": [
+   "rate-limits-and-errors.md",
+   "idempotency.md"
+  ],
+  "ref": "The same Idempotency-Key was reused with a different request body."
+ },
+ {
+  "q": "the buyer says the money never came back",
+  "gold": [
+   "refund-troubleshooting.md",
+   "refunds.md"
+  ],
+  "ref": "Check the refund status, share the ARN and allow 5-7 working days for cards."
+ },
+ {
+  "q": "why is my payout smaller than what my customers paid",
+  "gold": [
+   "settlement-reconciliation.md",
+   "settlement-fees-and-tax.md",
+   "refunds.md"
+  ],
+  "ref": "Fees, GST and refunds are deducted from the gross captured amount."
+ },
+ {
+  "q": "my monthly plan stopped billing after a card failure",
+  "gold": [
+   "recurring-payments.md"
+  ],
+  "ref": "Failed renewals are retried on days 1, 3 and 5, then the subscription is halted."
+ },
+ {
+  "q": "how much extra does instant refund cost",
+  "gold": [
+   "refunds.md"
+  ],
+  "ref": "speed optimum costs an extra 0.3% of the refund amount."
+ },
+ {
+  "q": "GET /v1/settlements/reconciliation",
+  "gold": [
+   "settlement-reconciliation.md",
+   "settlements.md"
+  ],
+  "ref": "Returns a per-payment breakdown for a settlement or date range."
+ },
+ {
+  "q": "can I test webhooks from my laptop",
+  "gold": [
+   "test-mode.md",
+   "webhook-troubleshooting.md"
+  ],
+  "ref": "RagPay does not deliver to localhost; use an HTTPS tunnel."
+ }
+]

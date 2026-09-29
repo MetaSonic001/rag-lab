@@ -1,0 +1,6 @@
+# Optional, heavier loaders/evaluators. The app detects them at runtime and
+# shows what is / isn't installed on the Build page.
+docling            # layout-aware document parsing (downloads ~1GB of models on first use)
+crawl4ai           # web crawling -> Markdown (run `crawl4ai-setup` afterwards for the browser)
+ragas              # reference RAG evaluation framework
+deepeval           # alternative evaluation framework
